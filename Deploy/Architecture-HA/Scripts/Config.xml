@@ -7,10 +7,12 @@
     <Variable Name="AADApplicationId" Value="My AAD application ID GUID"/>
     <Variable Name="AADAppCertThumbprint" Value="My thumbprint of the cert added to the AAD Service Principal"/>
     <Variable Name="AADServicePrincipalSecret" Value="My AAD Application Secret"/>
-    <!--Azure subscription name -->
-    <Variable Name="CurrentAzureSubscriptionName" Value="My Subscription Name"/>
+    <!--Azure subscription Id -->
+    <Variable Name="CurrentSubscriptionId" Value="1522c8af-eba6-42a4-b5bd-539ac58525cc"/>
     <!--Resource Group Name -->
-    <Variable Name="ResourceGroupName" Value="My name for the Azure Resource Group which contains the RDSH VMs"/>
+    <Variable Name="ResourceGroupName" Value="My Resource Group Name"/>
+    <!--VM ScaleSet Name-->
+    <Variable Name="ScaleSetName" Value="MyScaleSetName"/>
   </Azure>
   <RDSScaleSettings>
     <!-- Begin of the peak usage time -->
@@ -18,7 +20,7 @@
     <!-- End of the peak usage time -->
     <Variable Name="EndPeakTime" Value="18:00:00"/>
     <!-- Time difference between local time and UTC, in hours -->
-    <Variable Name="TimeDifferenceInHours" Value="-7" />
+    <!--<Variable Name="TimeDifferenceInHours" Value="-7" />-->
     <!-- Maximum number of sessions per CPU threshold used to determine when a new RDSH server needs to be started -->
     <Variable Name="SessionThresholdPerCPU" Value="3"/>
     <!-- Minimum number of RDSH servers to keep running during off-peak usage time -->
