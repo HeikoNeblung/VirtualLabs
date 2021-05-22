@@ -114,56 +114,6 @@ Function Set-ScriptVariable ($Name, $Value) {
 }
 
 <#
-.SYNOPSIS
-Function for retrieving session hosts in the given collection
-#>
-function Get-SessionHost {
-    param (
-        [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true, Position = 0)]
-        [string]
-        $CollectionAlias,
-
-        [Parameter(Mandatory = $false)]
-        [string]
-        $ConnectionBroker
-    )
-    try {
-        $wmiNamespace = "root\cimv2\rdms"
-        $wmiRDSHServerQuery = "SELECT * FROM Win32_RDSHServer WHERE CollectionAlias='" + $CollectionAlias + "'"
-        $rdshServers = Get-WmiObject -Namespace $wmiNamespace -Query $wmiRDSHServerQuery -ComputerName $ConnectionBroker -Authentication PacketPrivacy -ErrorAction Stop
-    }
-    catch {
-        Write-Error ("Failed to query Session Host from WMI", $_.Exception.Message)
-    }
-
-    if ( $null -eq $rdshServers ) {
-        return
-    }
-
-    foreach ($rdshServer in $rdshServers) {
-
-        try {
-            $res = $rdshServer.GetInt32Property("DrainMode")
-        }
-        catch {
-            Write-Error ("Failed to get DrainMode for session host;" + $rdshServer.Name, $_.Exception.Message)
-            continue
-        }
-
-        if ($null -ne $res -and 0 -ne $res.ReturnValue) {
-            Write-Error ("Failed to get DrainMode for session host;" + $rdshServer.Name, $_.Exception.Message)
-            continue
-        }
-
-        if ($null -ne $res -and 0 -eq $res.ReturnValue) {
-            $NewConnectionAllowed = $res.Value -as [Microsoft.RemoteDesktopServices.Management.RDServerNewConnectionAllowed]
-        }
-
-        New-Object Microsoft.RemoteDesktopServices.Management.RDServer `
-            -ArgumentList $CollectionName, $rdshServer.Name, $NewConnectionAllowed
-    }
-}
-<#
 Variables
 #>
 #Current Path
@@ -235,8 +185,6 @@ If ("$env:computername.$env:userdnsdomain" -ne $ConnectionBrokerFQDN) {
 #Load Azure ps module
 Import-Module -Name Az
 
-
-
 #To use certificate based authentication for service principal, please uncomment the following line
 #Add-AzureRmAccount -ServicePrincipal -CertificateThumbprint $AADAppCertThumbprint -ApplicationId $AADApplicationId -TenantId $AADTenantId
 
@@ -244,6 +192,8 @@ Import-Module -Name Az
 # $secpasswd = ConvertTo-SecureString $AADServicePrincipalSecret -AsPlainText -Force
 # $appcreds = New-Object System.Management.Automation.PSCredential ($AADApplicationId, $secpasswd)
 
+# don't save azure credentials
+Disable-AzContextAutosave -Scope Process
 # Add-AzureRmAccount -ServicePrincipal -Credential $appcreds -TenantId $AADTenantId
 # Connect-AzAccount -ServicePrincipal -Credential $appcreds -TenantId $AADTenantId -SubscriptionId $CurrentSubscriptionId
 Connect-AzAccount -Identity -SubscriptionId $CurrentSubscriptionId
@@ -289,7 +239,7 @@ if ($CurrentDateTime -ge $BeginPeakDateTime -and $CurrentDateTime -le $EndPeakDa
 
         #Get the Session Hosts in the collection
         try {
-            $RDSessionHost = Get-SessionHost -ConnectionBroker $ConnectionBrokerFQDN -CollectionAlias $collection.CollectionAlias
+            $RDSessionHost = Get-RDSessionHost -ConnectionBroker $ConnectionBrokerFQDN -CollectionName $collection.CollectionAlias
         }
         catch {
             Write-Log 1 "Failed to retrieve RDS session hosts in collection $($collection.CollectionName) : $($_.exception.message)" "Error"
@@ -465,7 +415,7 @@ else {
         Write-Log 3 "Processing collection $($collection.CollectionName)"
         #Get the Session Hosts in the collection
         try {
-            $RDSessionHost = Get-SessionHost -ConnectionBroker $ConnectionBrokerFQDN -CollectionAlias $collection.CollectionAlias
+            $RDSessionHost = Get-RDSessionHost -ConnectionBroker $ConnectionBrokerFQDN -CollectionName $collection.CollectionAlias
         }
         catch {
             Write-Log 1 "Failed to retrieve session hosts in collection: $($collection.CollectionName) with error: $($_.exception.message)" "Error"
