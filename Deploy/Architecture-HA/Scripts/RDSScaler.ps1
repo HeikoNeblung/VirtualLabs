@@ -239,7 +239,7 @@ if ($CurrentDateTime -ge $BeginPeakDateTime -and $CurrentDateTime -le $EndPeakDa
 
         #Get the Session Hosts in the collection
         try {
-            $RDSessionHost = Get-RDSessionHost -ConnectionBroker $ConnectionBrokerFQDN -CollectionName $collection.CollectionAlias
+            $RDSessionHost = Get-RDSessionHost -ConnectionBroker $ConnectionBrokerFQDN -CollectionName $collection.CollectionName
         }
         catch {
             Write-Log 1 "Failed to retrieve RDS session hosts in collection $($collection.CollectionName) : $($_.exception.message)" "Error"
@@ -415,7 +415,7 @@ else {
         Write-Log 3 "Processing collection $($collection.CollectionName)"
         #Get the Session Hosts in the collection
         try {
-            $RDSessionHost = Get-RDSessionHost -ConnectionBroker $ConnectionBrokerFQDN -CollectionName $collection.CollectionAlias
+            $RDSessionHost = Get-RDSessionHost -ConnectionBroker $ConnectionBrokerFQDN -CollectionName $collection.CollectionName
         }
         catch {
             Write-Log 1 "Failed to retrieve session hosts in collection: $($collection.CollectionName) with error: $($_.exception.message)" "Error"
