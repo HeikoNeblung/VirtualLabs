@@ -332,6 +332,15 @@ if ($CurrentDateTime -ge $BeginPeakDateTime -and $CurrentDateTime -le $EndPeakDa
                                     Exit 1
                                 }
 
+                                try {
+                                    Write-Log 1 "Disabling DrainMode on $($sessionHost.SessionHost)" "Info"
+                                    Set-RDSessionHost -SessionHost $sessionHost.SessionHost -NewConnectionAllowed Yes -ConnectionBroker $ConnectionBrokerFQDN -ErrorAction Stop
+                                }
+                                catch {
+                                    Write-Log 1 "Failed to disable DrainMode on $($sessionHost.SessionHost)" "Error"
+                                    Exit 1
+                                }
+
                                 # we need to calculate available capacity of sessions
                                 $coresAvailable = Get-AzVMSize -Location $VMSSInstance.Location | Where-Object Name -eq $VMSSInstance.Sku.Name
                                 $AvailableSessionCapacity = $AvailableSessionCapacity + $coresAvailable.NumberOfCores * $SessionThresholdPerCPU
@@ -379,6 +388,15 @@ if ($CurrentDateTime -ge $BeginPeakDateTime -and $CurrentDateTime -le $EndPeakDa
                                     }
                                     catch {
                                         Write-Log 1 "Failed to start Azure VM: $($VMSSInstance.OsProfile.ComputerName) with error: $($_.exception.message)" "Error"
+                                        Exit 1
+                                    }
+
+                                    try {
+                                        Write-Log 1 "Disabling DrainMode on $($sessionHost.SessionHost)" "Info"
+                                        Set-RDSessionHost -SessionHost $sessionHost.SessionHost -NewConnectionAllowed Yes -ConnectionBroker $ConnectionBrokerFQDN -ErrorAction Stop
+                                    }
+                                    catch {
+                                        Write-Log 1 "Failed to disable DrainMode on $($sessionHost.SessionHost)" "Error"
                                         Exit 1
                                     }
 
