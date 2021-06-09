@@ -500,6 +500,7 @@ else {
                             if ($IsVmRunning -eq $true) {
                                 #ensure the running Azure VM is set as drain mode
                                 try {
+                                    Write-Log 1 "Enable DrainMode on $($sessionHost.SessionHost)" "Info"
                                     Set-RDSessionHost -SessionHost $sessionHost.SessionHost -NewConnectionAllowed NotUntilReboot -ConnectionBroker $ConnectionBrokerFQDN -ErrorAction Stop
                                 }
                                 catch {
@@ -540,7 +541,7 @@ else {
 
                                 if ($LimitSecondsToForceLogOffUser -ne 0) {
                                     #force users to log off
-                                    Write-Log 1 "Force users to log off..." "Info"
+                                    Write-Log 1 "Force users to log off on $($sessionHost.SessionHost) ..." "Info"
                                     try {
                                         $CollectionUserSessions = Get-RDUserSession -ConnectionBroker $ConnectionBrokerFQDN -CollectionName $collection.CollectionName -ErrorAction Stop
                                     }
@@ -580,6 +581,9 @@ else {
                                     #decrement the number of running session host
                                     $numberOfRunningHost = $numberOfRunningHost - 1
                                     $totalRunningCores = $totalRunningCores - $coresFreedUp.NumberOfCores
+                                }
+                                else {
+                                    Write-Log 1 "Can't shutdown. There are $existingSession sessions left on $($sessionHost.SessionHost)" "Error"
                                 }
                             }
                             Break # break out of the inner foreach loop once a match is found and checked
