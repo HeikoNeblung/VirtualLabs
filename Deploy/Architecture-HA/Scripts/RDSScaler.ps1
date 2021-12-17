@@ -299,7 +299,7 @@ if ($CurrentDateTime -ge $BeginPeakDateTime -and $CurrentDateTime -le $EndPeakDa
         write-host "Current number of running hosts: " $numberOfRunningHost
         write-log 1 "Current number of running hosts: $numberOfRunningHost" "Info"
 
-        if ($numberOfRunningHost -lt $MinimumNumberOfRDSH) {
+        if ($numberOfRunningHost -lt $PeakTimeMinimumNumberOfRDSH) {
 
             Write-Log 1 "Current number of running session hosts is less than minimum requirements, start session host ..." "Info"
 
@@ -315,7 +315,7 @@ if ($CurrentDateTime -ge $BeginPeakDateTime -and $CurrentDateTime -le $EndPeakDa
                     Exit 1
                 }
                 #check whether the number of running VMs meets the minimum or not
-                if ($numberOfRunningHost -lt $MinimumNumberOfRDSH) {
+                if ($numberOfRunningHost -lt $PeakTimeMinimumNumberOfRDSH) {
                     foreach ($VMSSInstance in $VMSSInstances) {
                         if ($sessionHost.SessionHost.ToLower().Contains($VMSSInstance.OsProfile.ComputerName.ToLower() + ".")) {
                             #check if the azure VM is running or not
@@ -346,7 +346,7 @@ if ($CurrentDateTime -ge $BeginPeakDateTime -and $CurrentDateTime -le $EndPeakDa
                                 $AvailableSessionCapacity = $AvailableSessionCapacity + $coresAvailable.NumberOfCores * $SessionThresholdPerCPU
                                 $numberOfRunningHost = $numberOfRunningHost + 1
                                 $totalRunningCores = $totalRunningCores + $coresAvailable.NumberOfCores
-                                if ($numberOfRunningHost -ge $MinimumNumberOfRDSH) {
+                                if ($numberOfRunningHost -ge $PeakTimeMinimumNumberOfRDSH) {
                                     break;
                                 }
                             }
@@ -355,7 +355,7 @@ if ($CurrentDateTime -ge $BeginPeakDateTime -and $CurrentDateTime -le $EndPeakDa
                     }
                 }
             }
-        } # if ($numberOfRunningHost -lt $MinimumNumberOfRDSH) {
+        } # if ($numberOfRunningHost -lt $PeakTimeMinimumNumberOfRDSH) {
         else {
             #check if the available capacity meets the number of sessions or not
             write-Log 1 "Current total number of user sessions: $($CollectionUserSessions.Count)" "Info"

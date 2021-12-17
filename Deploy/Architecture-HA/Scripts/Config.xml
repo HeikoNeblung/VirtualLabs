@@ -23,6 +23,8 @@
     <!--<Variable Name="TimeDifferenceInHours" Value="-7" />-->
     <!-- Maximum number of sessions per CPU threshold used to determine when a new RDSH server needs to be started -->
     <Variable Name="SessionThresholdPerCPU" Value="3"/>
+    <!-- Minimum number of RDSH servers during peak time -->
+    <Variable Name="PeakTimeMinimumNumberOfRDSH" Value="2">
     <!-- Minimum number of RDSH servers to keep running during off-peak usage time -->
     <Variable Name="MinimumNumberOfRDSH" Value="1"/>
     <!--Number of seconds to wait before forcing users to logoff. If 0, don't force users to logoff -->
